@@ -212,6 +212,22 @@ export default function Hours({ hours }: TableProps) {
     [hours, rows, elevation, lowestReportedAltitude],
   );
 
+  // Open Extended Forecast after Hours mounts so BottomSheet listeners are ready
+  useEffect(() => {
+    try {
+      // Delay slightly to ensure BottomSheetInternals has registered its event listener
+      const id = window.setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("ppg.openBottomSheet", { detail: "extendedForecast" }),
+        );
+      }, 50);
+
+      return () => window.clearTimeout(id);
+    } catch (e) {
+      // ignore in non-browser environments
+    }
+  }, []);
+
   useEffect(() => {
     onScroll();
 

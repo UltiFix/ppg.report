@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import { BottomSheet as SpringBottomSheet } from "react-spring-bottom-sheet";
 import { faTimes } from "@fortawesome/pro-regular-svg-icons";
@@ -82,6 +82,7 @@ export interface BottomSheetProps {
   openButton?: React.ReactNode;
   children?: React.ReactNode;
   open?: boolean;
+  openKey?: string;
 }
 
 export default function BottomSheetInternals({
@@ -89,8 +90,42 @@ export default function BottomSheetInternals({
   openButton,
   children,
   open: _open,
+  openKey,
 }: BottomSheetProps) {
   const [open, setOpen] = useState(_open || false);
+
+  useEffect(() => {
+    setOpen(!!_open);
+  }, [_open]);
+
+  useEffect(() => {
+    if (!openKey) return;
+
+    function handler(e: Event) {
+      const detail = (e as CustomEvent).detail;
+      if (detail === openKey) setOpen(true);
+    }
+
+    window.addEventListener("ppg.openBottomSheet", handler as EventListener);
+    return () =>
+      window.removeEventListener("ppg.openBottomSheet", handler as EventListener);
+  }, [openKey]);
+
+  // Also support opening via a short-lived localStorage flag so we don't miss
+  // the event if it was fired before this listener attached.
+  useEffect(() => {
+    if (!openKey) return;
+
+    try {
+      const flag = localStorage.getItem("ppg.openBottomSheet");
+      if (flag === openKey) {
+        setOpen(true);
+        localStorage.removeItem("ppg.openBottomSheet");
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [openKey]);
 
   return (
     <>

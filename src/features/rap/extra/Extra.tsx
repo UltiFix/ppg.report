@@ -76,6 +76,7 @@ export default function Extra() {
       <InstallPrompt />
 
       <BottomSheet
+        openKey="extendedForecast"
         openButton={
           <Item icon={faCalendarAlt} iconBg={[50, 180, 255]} iconColor="black">
             {t("Extended Forecast")}

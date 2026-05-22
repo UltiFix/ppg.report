@@ -44,8 +44,25 @@ function ValidParamsReport({ lat, lon }: ValidParamsReportProps) {
   useEffect(() => {
     if (!isLatLonTrimmed(lat, lon)) return;
 
+    // Set a short-lived localStorage flag so BottomSheet can open if it mounts
+    // after this effect runs. Also dispatch the event for listeners already
+    // attached.
+    try {
+      localStorage.setItem("ppg.openBottomSheet", "extendedForecast");
+    } catch (e) {
+      // ignore
+    }
+
     dispatch(getWeather(+lat, +lon));
     dispatch(getTFRs(+lat, +lon));
+
+    try {
+      window.dispatchEvent(
+        new CustomEvent("ppg.openBottomSheet", { detail: "extendedForecast" }),
+      );
+    } catch (e) {
+      // ignore in non-browser environments
+    }
 
     return () => {
       dispatch(clearWeather());
