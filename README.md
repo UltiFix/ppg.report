@@ -1,4 +1,28 @@
 ```diff
+- ⚠️ This is a hacked up fork specifically modified to get behaivour I wanted
+- It auto loads last location
+- It auto opens the extended forecast
+- It filters the extended forecast based on wind parameters
+- It filters out nighttime hours
+- It has a docker container
+- AI was used
+
+-to build docker image (on local machine)
+get all the needed things installed on machine, then run these
+
+docker buildx build --platform linux/amd64 --secret id=npmrc,src=.npmrc -t ppg.report:latest --load .
+docker save -o ppg.report.tar ppg.report:latest
+
+
+
+-Load tar file to server host
+cd to folder with .tar file
+
+podman load -i ppg.report.tar
+podman run --platform linux/amd64 -it -p 5173:5173 docker.io/library/ppg.report:latest
+```
+
+```diff
 - ⚠️ Warning! Fly at your own risk.
 ```
 
